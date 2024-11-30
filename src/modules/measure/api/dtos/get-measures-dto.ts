@@ -7,9 +7,12 @@ export class GetMeasuresDTO {
   @IsEnum(['day', 'month', 'year'], {
     message: 'aggType must be "day" | "month" | "year"',
   })
+  @IsNotEmpty()
   aggType: 'day' | 'month' | 'year';
 
+  @IsNotEmpty()
   initialDate: string;
 
+  @IsNotEmpty()
   finalDate: string;
 }
