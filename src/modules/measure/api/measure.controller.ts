@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Post,
@@ -9,15 +10,14 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response, Express } from 'express';
 import { MeasureService } from '../app/measure.service';
+import { GetMeasuresDTO } from './dtos/get-measures-dto';
 
 @Controller('measure')
 export class MeasureController {
   constructor(private readonly measureService: MeasureService) {}
   @Get()
-  async getAll(@Res() response: Response) {
-    return response.json({
-      message: 'This position is mine',
-    });
+  async getAll(@Body() data: GetMeasuresDTO, @Res() response: Response) {
+    return response.json(await this.measureService.getAll(data));
   }
 
   @Post()
