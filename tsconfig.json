@@ -15,7 +15,6 @@
       "@shared/*": ["shared/*"],
       "@root/*": ["*"],
     },
-    "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
