@@ -1,8 +1,8 @@
 import { Controller, Get, Res } from '@nestjs/common';
 import { Response } from 'express';
 
-@Controller('metric')
-export class MetricController {
+@Controller('measure')
+export class MeasureController {
   @Get()
   async getAll(@Res() response: Response) {
     return response.json({

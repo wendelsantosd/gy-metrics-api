@@ -1,9 +1,9 @@
-import { MetricController } from '@modules/metric/api/metric.controller';
+import { MeasureModule } from '@modules/measure/api/measure.module';
 import { Module } from '@nestjs/common';
 
 @Module({
-  imports: [],
-  controllers: [MetricController],
+  imports: [MeasureModule],
+  controllers: [],
   providers: [],
 })
 export class AppModule {}
