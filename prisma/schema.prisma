@@ -8,10 +8,21 @@ datasource db {
 }
 
 model Metric {
+  id         Int       @id @default(autoincrement())
+  measures   Measure[]
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+
+  @@map("metrics")
+}
+
+model Measure {
   id         Int      @id @default(autoincrement())
-  name       String   @db.VarChar(255)
+  value      Int
+  Metric     Metric?  @relation(fields: [metricId], references: [id])
+  metricId   Int?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  @@map("metrics")
+  @@map("measures")
 }
