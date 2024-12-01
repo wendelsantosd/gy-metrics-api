@@ -3,7 +3,7 @@ import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { MeasureRepository } from '../repository/measure.repository';
 import { OutputGetAll, OutputExport } from '../repository/measure.interface';
-import { format, parse, setDate, setMonth } from 'date-fns';
+import { format, parse } from 'date-fns';
 import xlsx from 'xlsx-creator';
 
 type IMeasureGetAll = {
@@ -45,7 +45,42 @@ export class MeasureService {
       finalDate: parse(query.finalDate, 'yyyy-MM-dd', new Date()),
     };
 
-    const result = await this.measureRepository.toExport(formatedDate);
+    const measures = await this.measureRepository.getAll(formatedDate);
+
+    const aggDay = measures.reduce((acc, measure) => {
+      const day = this.getTruncatedDate(new Date(measure.created_at), 'day');
+      acc[day] = (acc[day] || 0) + measure.value;
+      return acc;
+    }, {});
+
+    const aggMonth = measures.reduce((acc, measure) => {
+      const month = this.getTruncatedDate(
+        new Date(measure.created_at),
+        'month',
+      );
+      acc[month] = (acc[month] || 0) + measure.value;
+      return acc;
+    }, {});
+
+    const aggYear = measures.reduce((acc, measure) => {
+      const year = this.getTruncatedDate(new Date(measure.created_at), 'year');
+      acc[year] = (acc[year] || 0) + measure.value;
+      return acc;
+    }, {});
+
+    const result: OutputExport[] = [];
+
+    Object.keys(aggDay).forEach((date) => {
+      const month = format(date, 'yyyy-MM');
+      const year = format(date, 'yyyy');
+      result.push({
+        metricId: +query.metricId,
+        dateTime: format(new Date(date), 'dd-MM-yyyy'),
+        aggDay: aggDay[date],
+        aggMonth: aggMonth[month] || 0,
+        aggYear: aggYear[year] || 0,
+      });
+    });
 
     const buffer: Buffer = xlsx.build([
       {
@@ -79,9 +114,9 @@ export class MeasureService {
       case 'day':
         return format(date, 'yyyy-MM-dd');
       case 'month':
-        return format(setDate(new Date(date), 1), 'yyyy-MM-dd');
+        return format(date, 'yyyy-MM');
       case 'year':
-        return format(setMonth(setDate(new Date(date), 1), 0), 'yyyy-MM-dd');
+        return format(date, 'yyyy');
       default:
         return format(date, 'yyyy-MM-dd');
     }

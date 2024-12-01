@@ -1,3 +1,4 @@
+import { AggType } from '@modules/measure/app/measure.service';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 export class GetMeasuresDTO {
@@ -8,7 +9,7 @@ export class GetMeasuresDTO {
     message: 'aggType must be "day" | "month" | "year"',
   })
   @IsNotEmpty()
-  aggType: 'day' | 'month' | 'year';
+  aggType: AggType;
 
   @IsString()
   @IsNotEmpty()

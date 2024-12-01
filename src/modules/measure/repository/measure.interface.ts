@@ -1,4 +1,4 @@
-export type Input = {
+export type InputSave = {
   metricId: number;
   dateTime: string | Date;
   value: number;
@@ -15,12 +15,6 @@ export type InputGetAll = {
   finalDate: Date;
 };
 
-export type InputExport = {
-  metricId: number;
-  initialDate: Date;
-  finalDate: Date;
-};
-
 export type OutputExport = {
   metricId: number;
   dateTime: string;
@@ -30,7 +24,6 @@ export type OutputExport = {
 };
 
 export interface IMeasureRepository {
-  save(inputs: Input): Promise<void>;
+  save(inputs: InputSave): Promise<void>;
   getAll(data: InputGetAll): Promise<OutputGetAll[]>;
-  toExport(data: InputExport): Promise<OutputExport[]>;
 }
