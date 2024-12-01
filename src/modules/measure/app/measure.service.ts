@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { MeasureRepository } from '../repository/measure.repository';
-import { Output, OutputExport } from '../repository/measure.interface';
-import { parse } from 'date-fns';
+import { OutputGetAll, OutputExport } from '../repository/measure.interface';
+import { format, parse, setDate, setMonth } from 'date-fns';
 import xlsx from 'xlsx-creator';
 
 type IMeasureGetAll = {
@@ -18,6 +18,13 @@ type IExportMeasure = {
   initialDate: string;
   finalDate: string;
 };
+
+type IResponseGetAll = {
+  date: string;
+  value: number;
+}[];
+
+export type AggType = 'day' | 'month' | 'year';
 
 @Injectable()
 export class MeasureService {
@@ -53,7 +60,7 @@ export class MeasureService {
     return Buffer.from(buffer);
   }
 
-  async getAll(data: IMeasureGetAll): Promise<Output[]> {
+  async getAll(data: IMeasureGetAll): Promise<IResponseGetAll> {
     const formatedDate = {
       ...data,
       initialDate: parse(data.initialDate, 'yyyy-MM-dd', new Date()),
@@ -62,6 +69,49 @@ export class MeasureService {
 
     const measures = await this.measureRepository.getAll(formatedDate);
 
-    return measures;
+    const measuresGroup = this.groupByDate(measures, data.aggType);
+
+    return measuresGroup as IResponseGetAll;
+  }
+
+  private getTruncatedDate(date: Date, aggType: AggType): string {
+    switch (aggType) {
+      case 'day':
+        return format(date, 'yyyy-MM-dd');
+      case 'month':
+        return format(setDate(new Date(date), 1), 'yyyy-MM-dd');
+      case 'year':
+        return format(setMonth(setDate(new Date(date), 1), 0), 'yyyy-MM-dd');
+      default:
+        return format(date, 'yyyy-MM-dd');
+    }
+  }
+
+  private groupByDate(
+    measures: OutputGetAll[],
+    aggType: AggType,
+  ): Record<string, any>[] {
+    const grouped = measures.reduce((acc, measure) => {
+      const truncatedDate = this.getTruncatedDate(
+        new Date(measure.created_at),
+        aggType,
+      );
+
+      if (!acc[truncatedDate]) {
+        acc[truncatedDate] = {
+          date: truncatedDate,
+          value: 0,
+        };
+      }
+
+      acc[truncatedDate].value += measure.value;
+
+      return acc;
+    }, {});
+
+    return Object.values(grouped).sort(
+      (a: { date: string }, b: { date: string }) =>
+        new Date(a.date).getTime() - new Date(b.date).getTime(),
+    );
   }
 }

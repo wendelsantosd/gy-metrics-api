@@ -4,7 +4,7 @@ import {
   Input,
   InputExport,
   InputGetAll,
-  Output,
+  OutputGetAll,
   OutputExport,
 } from './measure.interface';
 import { Injectable } from '@nestjs/common';
@@ -77,9 +77,9 @@ export class MeasureRepository implements IMeasureRepository {
     }
   }
 
-  async getAll(data: InputGetAll): Promise<Output[]> {
+  async getAll(data: InputGetAll): Promise<OutputGetAll[]> {
     try {
-      const result = await this.prismaService.measure.findMany({
+      return await this.prismaService.measure.findMany({
         where: {
           metricId: data.metricId,
           created_at: {
@@ -92,13 +92,6 @@ export class MeasureRepository implements IMeasureRepository {
           value: true,
         },
       });
-
-      const groupedArray = this.groupByDate(result, data.aggType);
-
-      return groupedArray.map((item) => ({
-        date: item.date,
-        value: item.value,
-      }));
     } catch (error) {
       console.log('Error Database', error);
     }
