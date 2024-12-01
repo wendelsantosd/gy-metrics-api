@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 export class GetMeasuresDTO {
   @IsNotEmpty()
@@ -10,9 +10,11 @@ export class GetMeasuresDTO {
   @IsNotEmpty()
   aggType: 'day' | 'month' | 'year';
 
+  @IsString()
   @IsNotEmpty()
   initialDate: string;
 
+  @IsString()
   @IsNotEmpty()
   finalDate: string;
 }

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Query,
   Post,
   Res,
   UploadedFile,
@@ -10,7 +11,8 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response, Express } from 'express';
 import { MeasureService } from '../app/measure.service';
-import { GetMeasuresDTO } from './dtos/get-measures-dto';
+import { GetMeasuresDTO } from './dtos/get-measures.dto';
+import { ExportMeasureDTO } from './dtos/export-measure.dto';
 
 @Controller('measure')
 export class MeasureController {
@@ -18,6 +20,17 @@ export class MeasureController {
   @Get()
   async getAll(@Body() data: GetMeasuresDTO, @Res() response: Response) {
     return response.json(await this.measureService.getAll(data));
+  }
+
+  @Get('export')
+  async export(@Query() query: ExportMeasureDTO, @Res() response: Response) {
+    response.set({
+      'Content-Type':
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': `attachment; filename=measures.xlsx`,
+    });
+
+    return response.send(await this.measureService.export(query));
   }
 
   @Post()

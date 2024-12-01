@@ -5075,6 +5075,11 @@ write-file-atomic@^4.0.2:
     imurmurhash "^0.1.4"
     signal-exit "^3.0.7"
 
+xlsx-creator@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/xlsx-creator/-/xlsx-creator-1.0.0.tgz#106f164446f96f20f69c21a6453fa04c03208968"
+  integrity sha512-bYa86HlZsF6vKHS3SSoE7Bmf0qcTDOacx9/qrzMInbWdZABy+zuH1k8m8a1oC6/jaMCHqRZbGhTMFdgQqItkHw==
+
 xtend@^4.0.0:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/xtend/-/xtend-4.0.2.tgz#bb72779f5fa465186b1f438f674fa347fdb5db54"
