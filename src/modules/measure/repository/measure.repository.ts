@@ -71,8 +71,6 @@ export class MeasureRepository implements IMeasureRepository {
         });
       });
 
-      console.log(result);
-
       return result;
     } catch (error) {
       console.log('Error Database', error);
